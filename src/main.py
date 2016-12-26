@@ -9,16 +9,22 @@ import operator
 import numpy
 import math
 import time
+from ball import *
+from table import *
 
+
+#Tamaños
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 FPS = 60
-
-VEL_INCREMENT = 1.05
-MAX_VEL = 15
-
 NORMAL_SIZE = 70
 
+#Velovidades
+VEL_INCREMENT = 1.05
+MAX_VEL = 15
+MAX_TABLE_VEL = 13
+
+#Colores
 WHITE = 255,255,255
 BLACK = 0,0,0
 PURPLE = 102,0,102
@@ -34,89 +40,6 @@ def collition(rec1, rec2):
 	else:
 		return False
 
-class Table: 
-	def __init__(self,x,y,w,h,side):
-		self.side = side # "r": pega por la derecha, "l": pega por la izq.
-		self.pos = (x,y)
-		self.h = h
-		self.w = w
-		self.vel = 8
-		self.color = WHITE
-		self.image = pygame.Surface((w, h))
-		self.image.fill(self.color)
-
-	def draw(self, screen):
-		screen.blit(self.image, self.pos)
-
-	def move_up(self):
-		self.pos = numpy.subtract(self.pos, (0, self.vel))
-		if self.pos[1] < TOP:
-			self.pos = (self.pos[0], TOP)
-
-	def move_down(self):
-		self.pos = numpy.add(self.pos, (0, self.vel))
-		if self.pos[1]+self.h > BOT:
-			self.pos = (self.pos[0], BOT-self.h)
-
-	#Chequear si bola golpea esta tabla
-	def hit(self, ball):
-		if collition( (ball.pos[0]-ball.r, ball.pos[1]-ball.r, ball.r*2, ball.r*2),
-		(self.pos[0], self.pos[1], self.w, self.h) ):
-			if (self.side == "l" and ball.vel[0] > 0):
-				dy = ball.pos[1] - (self.pos[1]+self.h/2)
-				dx = self.h/2.0
-				alpha = math.atan(float(dy)/dx)
-				vel = (ball.vel[0]**2+ball.vel[1]**2)**0.5
-				vel = vel*VEL_INCREMENT
-				if vel > MAX_VEL:
-					vel = MAX_VEL
-				ball.vel = (-math.cos(alpha)*vel, math.sin(alpha)*vel)
-			if (self.side == "r" and ball.vel[0] < 0):
-				dy = ball.pos[1] - (self.pos[1]+self.h/2)
-				dx = self.h/2.0
-				alpha = math.atan(float(dy)/dx)
-				vel = (ball.vel[0]**2+ball.vel[1]**2)**0.5
-				vel = vel*VEL_INCREMENT
-				if vel > MAX_VEL:
-					vel = MAX_VEL
-				ball.vel = (math.cos(alpha)*vel, math.sin(alpha)*vel)
-			return True
-		else:
-			return False
-
-
-
-class Ball: 
-	def __init__(self,x,y,r, vel):
-		self.pos = (x, y)
-		self.r = r
-		self.vel = vel
-		self.color = WHITE
-		self.image = pygame.Surface((self.r*2, self.r*2), pygame.SRCALPHA, 32)
-		pygame.draw.circle(self.image, self.color, (self.r,self.r), self.r)
-
-	def draw(self, screen):
-		screen.blit(self.image, numpy.subtract(self.pos, (self.r, self.r)))
-
-	def update(self):
-		# Choque con bordes superior e inferior.
-		if self.pos[1] + self.r > BOT:
-			self.vel = (self.vel[0], -self.vel[1])
-		if self.pos[1] - self.r < TOP:
-			self.vel = (self.vel[0], -self.vel[1])
-
-		#Actualizar velocidad
-		self.pos = numpy.add(self.pos, self.vel)
-
-	#Si la bola esta fuera de la pantalla
-	def out(self):
-		if self.pos[0]-self.r > SCREEN_WIDTH:
-			return 2
-		if self.pos[0]+self.r < 0:
-			return 1
-		return 0
-
-
 
 def main():
 
@@ -124,9 +47,6 @@ def main():
 	pygame.init()
 
 	print "   Welcome to Pong Deluxe!"
-
-	#Fuentes
-	myfont = pygame.font.SysFont("monospace", 25)
 
 	#Objetos del juego
 	ball = Ball(SCREEN_WIDTH/2, (TOP+BOT)/2.0, 10, (5,0))
@@ -142,11 +62,18 @@ def main():
 	score_p2 = 0
 	start_p1 = False
 
+	#Fuentes
+	myfont = pygame.font.SysFont("monospace", 25)
+	myfont2 = pygame.font.SysFont("monospace", 15)
+
 	#Etiquetas
 	score_p1_label = myfont.render(str(score_p1), 2, WHITE)
 	score_p2_label = myfont.render(str(score_p2), 2, WHITE)
 	press_enter_label = myfont.render("PRESS ENTER", 2, WHITE)
 	paused_label = myfont.render("PAUSED", 2, WHITE)
+	instruc_label_1 = myfont2.render("Press 'P' for pause the game.", 2, WHITE)
+	instruc_label_2 = myfont2.render("Player 1 moves with 'W' and 'S'.", 2, WHITE)
+	instruc_label_3 = myfont2.render("Player 2 moves with UP and DOWN arrows.", 2, WHITE)
 
 	#Reloj
 	clock 	= pygame.time.Clock()
@@ -220,7 +147,10 @@ def main():
 			if flag1 or flag2:
 				table1.vel *= VEL_INCREMENT
 				table2.vel *= VEL_INCREMENT
-
+				if table1.vel > MAX_TABLE_VEL:
+					table1.vel = MAX_TABLE_VEL
+				if table2.vel > MAX_TABLE_VEL:
+					table2.vel = MAX_TABLE_VEL
 		#Dibujando
 		screen.blit(background, (0, 0))
 		screen.blit(border, (0,TOP-10))
@@ -232,6 +162,10 @@ def main():
 			screen.blit(press_enter_label, (SCREEN_WIDTH/2-80, (TOP+BOT)/3))
 		if paused:
 			screen.blit(paused_label, (SCREEN_WIDTH/2-80, (TOP+BOT)/3))
+		if paused or not started:
+			screen.blit(instruc_label_1, (SCREEN_WIDTH/2-160, (TOP+BOT)/2 + 30))
+			screen.blit(instruc_label_2, (SCREEN_WIDTH/2-160, (TOP+BOT)/2 + 46))
+			screen.blit(instruc_label_3, (SCREEN_WIDTH/2-160, (TOP+BOT)/2 + 62))
 		screen.blit(score_p1_label, (SCREEN_WIDTH/4-10, 10))
 		screen.blit(score_p2_label, (SCREEN_WIDTH*0.75-10, 10))
 		
