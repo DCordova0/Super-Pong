@@ -46,13 +46,13 @@ def main():
 	#Iniciar Pygame
 	pygame.init()
 
-	print "   Welcome to Pong Deluxe!"
+	print("   Welcome to Pong Deluxe!")
 
 	#Objetos del juego
 	ball = Ball(SCREEN_WIDTH/2, (TOP+BOT)/2.0, 10, (5,0))
-	table1 = Table(10 , (TOP+BOT)/2.0-NORMAL_SIZE/2.0, 
+	table1 = Table(10 , (TOP+BOT)/2.0-NORMAL_SIZE/2.0,
 		14, NORMAL_SIZE, "r")
-	table2 = Table(SCREEN_WIDTH-10-10 , (TOP+BOT)/2.0-NORMAL_SIZE/2.0, 
+	table2 = Table(SCREEN_WIDTH-10-10 , (TOP+BOT)/2.0-NORMAL_SIZE/2.0,
 		14, NORMAL_SIZE, "l")
 
 	#Variables
@@ -99,7 +99,7 @@ def main():
 		#Manejo de eventos
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
-				print "   See you soon :) ..."
+				print("   See you soon :) ...")
 				sys.exit()
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_p:
@@ -120,7 +120,7 @@ def main():
 				table2.move_up()
 			if keys[pygame.K_DOWN]:
 				table2.move_down()
-		
+
 			out = ball.out()
 			if out == 1 or out == 2:
 				started = False
@@ -135,9 +135,9 @@ def main():
 					ball = Ball(SCREEN_WIDTH/2, (TOP+BOT)/2.0, 10, (5,0))
 				else:
 					ball = Ball(SCREEN_WIDTH/2, (TOP+BOT)/2.0, 10, (-5,0))
-				table1 = Table(10 , (TOP+BOT)/2.0-NORMAL_SIZE/2.0, 14, 
+				table1 = Table(10 , (TOP+BOT)/2.0-NORMAL_SIZE/2.0, 14,
 					NORMAL_SIZE, "r")
-				table2 = Table(SCREEN_WIDTH-10-10 , (TOP+BOT)/2.0-NORMAL_SIZE/2.0, 
+				table2 = Table(SCREEN_WIDTH-10-10 , (TOP+BOT)/2.0-NORMAL_SIZE/2.0,
 					14, NORMAL_SIZE, "l")
 
 			#Actualizando
@@ -168,12 +168,10 @@ def main():
 			screen.blit(instruc_label_3, (SCREEN_WIDTH/2-160, (TOP+BOT)/2 + 62))
 		screen.blit(score_p1_label, (SCREEN_WIDTH/4-10, 10))
 		screen.blit(score_p2_label, (SCREEN_WIDTH*0.75-10, 10))
-		
+
 		#Hacer visibles los cambios
 		pygame.display.flip()
 
 
 if __name__ == "__main__":
 	main()
-
-		

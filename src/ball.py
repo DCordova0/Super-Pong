@@ -1,6 +1,6 @@
 import pygame, numpy, main
 
-class Ball: 
+class Ball:
 	def __init__(self,x,y,r, vel):
 		self.pos = (x, y)
 		self.r = r
@@ -31,4 +31,4 @@ class Ball:
 		return 0
 
 if __name__ == "__main__":
-	print "Hola"
+	print("Hola")
